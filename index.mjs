@@ -1,9 +1,8 @@
-const puppeteer = require('puppeteer');
-const { stringify } = require('querystring');
+import puppeteer from 'puppeteer';
 
 async function scrape(i) {
     console.log('starting...')
-    console.log(i)
+  
     let base_url = "https://rarity.tools/mypethooligan/view/"
     let rank_url = base_url+i
     const browser = await puppeteer.launch();
@@ -11,8 +10,7 @@ async function scrape(i) {
     
     await page.goto(rank_url, { waitUntil: 'networkidle0' });
 
-    const result = await page.evaluate(async () => {
-        console.log('Browser scope.');
+    const result = await page.evaluate(() => {
         let elementTxtArr = null;
         document.querySelectorAll("span.font-bold.whitespace-nowrap").forEach((a)=> {
            console.log(a.innerText);
@@ -20,13 +18,16 @@ async function scrape(i) {
         });
         return elementTxtArr;
     });
-    console.log(i,result);
 
     await browser.close();
-    return(i,result)
+
+    return {
+        index: i,
+        result
+    }
 };
 
 for (let i =0; i <= 7; i++) {
-    results= scrape(i)
+    const results = await scrape(i)
     console.log(results)
  }
